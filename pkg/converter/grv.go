@@ -32,6 +32,22 @@ const (
 	ManagementClusterResourceKind = ManagementKindPrefix + "cluster"
 )
 
+// SteveTypeForGVR returns Steve's flattened type identifier for a
+// GroupVersionResource, matching the convention Rancher's own Steve API
+// uses: the plural resource name for core (group-less) resources
+// (e.g. "namespaces", "pods"), and "{group}.{resource}" otherwise
+// (e.g. "management.cattle.io.clusters"). Confirmed against the real
+// endpoints used by Rancher's own Steve clients:
+//
+//	{rancherURL}/k8s/clusters/{id}/v1/namespaces
+//	{rancherURL}/k8s/clusters/local/v1/management.cattle.io.clusters/{id}
+func SteveTypeForGVR(gvr schema.GroupVersionResource) string {
+	if gvr.Group == "" {
+		return gvr.Resource
+	}
+	return gvr.Group + "." + gvr.Resource
+}
+
 // K8sKindsToGVRs maps lowercase Kubernetes resource kind names to their corresponding
 // GroupVersionResource (GVR) identifiers. This mapping is used for dynamic client operations
 // to resolve resource types across different API groups and versions.

@@ -6,6 +6,7 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/rancher/rancher-ai-mcp/pkg/client/stevetest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	v1 "k8s.io/api/core/v1"
@@ -125,6 +126,7 @@ func TestGetClusterId(t *testing.T) {
 				DynClientCreator: func(inConfig *rest.Config) (dynamic.Interface, error) {
 					return test.fakeDynClient, nil
 				},
+				SteveTransport: stevetest.NewRoundTripper(test.fakeDynClient),
 			}
 
 			clusterID, err := c.GetClusterID(context.TODO(), fakeToken, test.clusterNameOrIDInput)
@@ -209,6 +211,7 @@ func TestGetResource(t *testing.T) {
 				DynClientCreator: func(inConfig *rest.Config) (dynamic.Interface, error) {
 					return test.fakeDynClient, nil
 				},
+				SteveTransport: stevetest.NewRoundTripper(test.fakeDynClient),
 			}
 
 			result, err := c.GetResource(context.Background(), test.params)
@@ -305,6 +308,7 @@ func TestGetResources(t *testing.T) {
 				DynClientCreator: func(inConfig *rest.Config) (dynamic.Interface, error) {
 					return test.fakeDynClient, nil
 				},
+				SteveTransport: stevetest.NewRoundTripper(test.fakeDynClient),
 			}
 
 			results, err := c.GetResources(context.Background(), test.params)

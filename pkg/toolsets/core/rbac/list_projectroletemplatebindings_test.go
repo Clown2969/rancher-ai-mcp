@@ -6,6 +6,7 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"github.com/rancher/rancher-ai-mcp/internal/middleware"
 	"github.com/rancher/rancher-ai-mcp/pkg/client"
+	"github.com/rancher/rancher-ai-mcp/pkg/client/stevetest"
 	"github.com/rancher/rancher-ai-mcp/pkg/client/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -199,6 +200,7 @@ func TestListProjectRoleTemplateBindings(t *testing.T) {
 			fakeDynClient := dynamicfake.NewSimpleDynamicClientWithCustomListKinds(rbacScheme(), rbacGVRs, tt.objects...)
 			c := &client.Client{
 				DynClientCreator: func(_ *rest.Config) (dynamic.Interface, error) { return fakeDynClient, nil },
+				SteveTransport: stevetest.NewRoundTripper(fakeDynClient),
 			}
 			tools := NewTools(test.WrapClient(c, fakeToken), false)
 

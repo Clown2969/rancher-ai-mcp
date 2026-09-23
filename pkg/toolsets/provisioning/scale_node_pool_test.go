@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/rancher/rancher-ai-mcp/pkg/client"
+	"github.com/rancher/rancher-ai-mcp/pkg/client/stevetest"
 	"k8s.io/utils/ptr"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
@@ -601,6 +602,7 @@ func TestScaleNodePool(t *testing.T) {
 				DynClientCreator: func(inConfig *rest.Config) (dynamic.Interface, error) {
 					return test.fakeDynClient, nil
 				},
+				SteveTransport: stevetest.NewRoundTripperWithListKinds(test.fakeDynClient, provisioningCustomListKinds()),
 			}
 			tools := Tools{client: c}
 

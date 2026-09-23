@@ -6,6 +6,7 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"github.com/rancher/rancher-ai-mcp/internal/middleware"
 	"github.com/rancher/rancher-ai-mcp/pkg/client"
+	"github.com/rancher/rancher-ai-mcp/pkg/client/stevetest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
@@ -104,6 +105,7 @@ func TestGetProject(t *testing.T) {
 			DynClientCreator: func(inConfig *rest.Config) (dynamic.Interface, error) {
 				return fakeDynClient, nil
 			},
+			SteveTransport: stevetest.NewRoundTripper(fakeDynClient),
 		}
 		tools := Tools{client: newFakeToolsClient(c, fakeToken)}
 
@@ -223,6 +225,7 @@ func TestGetProject(t *testing.T) {
 			DynClientCreator: func(inConfig *rest.Config) (dynamic.Interface, error) {
 				return fakeDynClient, nil
 			},
+			SteveTransport: stevetest.NewRoundTripper(fakeDynClient),
 		}
 		tools := Tools{client: newFakeToolsClient(c, fakeToken)}
 
@@ -289,6 +292,7 @@ func TestGetProject(t *testing.T) {
 			DynClientCreator: func(inConfig *rest.Config) (dynamic.Interface, error) {
 				return fakeDynClient, nil
 			},
+			SteveTransport: stevetest.NewRoundTripper(fakeDynClient),
 		}
 		tools := Tools{client: newFakeToolsClient(c, fakeToken)}
 
@@ -307,6 +311,7 @@ func TestGetProject(t *testing.T) {
 			DynClientCreator: func(inConfig *rest.Config) (dynamic.Interface, error) {
 				return fakeDynClient, nil
 			},
+			SteveTransport: stevetest.NewRoundTripper(fakeDynClient),
 		}
 		tools := Tools{client: newFakeToolsClient(c, fakeToken)}
 

@@ -6,6 +6,7 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"github.com/rancher/rancher-ai-mcp/internal/middleware"
 	"github.com/rancher/rancher-ai-mcp/pkg/client"
+	"github.com/rancher/rancher-ai-mcp/pkg/client/stevetest"
 	"github.com/rancher/rancher-ai-mcp/pkg/client/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -138,6 +139,7 @@ func TestGetNodes(t *testing.T) {
 				DynClientCreator: func(inConfig *rest.Config) (dynamic.Interface, error) {
 					return tt.fakeDynClient, nil
 				},
+				SteveTransport: stevetest.NewRoundTripper(tt.fakeDynClient),
 			}
 			tools := NewTools(test.WrapClient(c, fakeToken), false)
 			req := test.NewCallToolRequest(tt.requestURL)

@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"net/url"
 	"os"
 	"strings"
@@ -30,6 +31,11 @@ type Client struct {
 	caBundle         []byte
 	DynClientCreator func(*rest.Config) (dynamic.Interface, error)
 	ClientSetCreator func(*rest.Config) (kubernetes.Interface, error)
+	// SteveTransport overrides the HTTP transport used by SteveGet/SteveList
+	// (see steve.go). Tests substitute this with a fake so Steve-routed
+	// methods can be exercised without a real Rancher server, the same way
+	// DynClientCreator/ClientSetCreator substitute the typed/dynamic clients.
+	SteveTransport http.RoundTripper
 }
 
 // GetParams holds the parameters required to get a resource from k8s.
@@ -128,34 +134,19 @@ func (c *Client) GetResourceInterface(ctx context.Context, token string, namespa
 	return resourceInterface, nil
 }
 
-// GetResource retrieves a single Kubernetes resource by name.
-// It returns the resource as an unstructured object or an error if the resource is not found.
+// GetResource retrieves a single Kubernetes resource by name through Steve
+// (see steve.go) so that tokens without cluster-wide RBAC still get a
+// filtered result instead of a hard 403.
 func (c *Client) GetResource(ctx context.Context, params GetParams) (*unstructured.Unstructured, error) {
-	resourceInterface, err := c.GetResourceInterface(ctx, params.Token, params.Namespace, params.Cluster, converter.K8sKindsToGVRs[strings.ToLower(params.Kind)])
-	if err != nil {
-		return nil, err
-	}
-
-	obj, err := resourceInterface.Get(ctx, params.Name, metav1.GetOptions{})
-	if err != nil {
-		return nil, err
-	}
-
-	return obj, err
+	return c.GetResourceByGVR(ctx, params, converter.K8sKindsToGVRs[strings.ToLower(params.Kind)])
 }
 
 func (c *Client) GetResourceByGVR(ctx context.Context, params GetParams, gvr schema.GroupVersionResource) (*unstructured.Unstructured, error) {
-	resourceInterface, err := c.GetResourceInterface(ctx, params.Token, params.Namespace, params.Cluster, gvr)
+	clusterID, err := c.GetClusterID(ctx, params.Token, params.Cluster)
 	if err != nil {
 		return nil, err
 	}
-
-	obj, err := resourceInterface.Get(ctx, params.Name, metav1.GetOptions{})
-	if err != nil {
-		return nil, err
-	}
-
-	return obj, err
+	return c.SteveGet(ctx, params.Token, clusterID, gvr, params.Namespace, params.Name)
 }
 
 // GetResourceAtAnyAPIVersion queries the API server for all supported versions of the group and resource related to the passed kind. It then attempts to get the
@@ -175,15 +166,15 @@ func (c *Client) GetResourceAtAnyAPIVersion(ctx context.Context, params GetParam
 		return nil, err
 	}
 
+	clusterID, err := c.GetClusterID(ctx, params.Token, params.Cluster)
+	if err != nil {
+		return nil, err
+	}
+
 	var item *unstructured.Unstructured
 	for _, version := range versions {
 		currentGVK.Version = version
-		resourceInterface, err := c.GetResourceInterface(ctx, params.Token, params.Namespace, params.Cluster, currentGVK)
-		if err != nil {
-			return nil, err
-		}
-
-		item, err = resourceInterface.Get(ctx, params.Name, metav1.GetOptions{})
+		item, err = c.SteveGet(ctx, params.Token, clusterID, currentGVK, params.Namespace, params.Name)
 		if err != nil {
 			if errors.IsNotFound(err) {
 				continue
@@ -203,32 +194,15 @@ func (c *Client) GetResourceAtAnyAPIVersion(ctx context.Context, params GetParam
 	return item, err
 }
 
-// GetResources lists Kubernetes resources matching the provided parameters.
-// It supports optional label selectors for filtering and returns a slice of unstructured objects.
+// GetResources lists Kubernetes resources matching the provided parameters
+// through Steve (see steve.go), so a token restricted to namespace/project
+// RBAC gets the filtered collection it can see instead of a 403.
 func (c *Client) GetResources(ctx context.Context, params ListParams) ([]*unstructured.Unstructured, error) {
-	resourceInterface, err := c.GetResourceInterface(ctx, params.Token, params.Namespace, params.Cluster, converter.K8sKindsToGVRs[strings.ToLower(params.Kind)])
+	clusterID, err := c.GetClusterID(ctx, params.Token, params.Cluster)
 	if err != nil {
 		return nil, err
 	}
-
-	opts := metav1.ListOptions{}
-	if params.LabelSelector != "" {
-		opts.LabelSelector = params.LabelSelector
-	}
-	if params.Limit > 0 {
-		opts.Limit = params.Limit
-	}
-	list, err := resourceInterface.List(ctx, opts)
-	if err != nil {
-		return nil, err
-	}
-
-	objs := make([]*unstructured.Unstructured, len(list.Items))
-	for i := range list.Items {
-		objs[i] = &list.Items[i]
-	}
-
-	return objs, err
+	return c.SteveList(ctx, params.Token, clusterID, converter.K8sKindsToGVRs[strings.ToLower(params.Kind)], params.Namespace, params.LabelSelector, params.Limit)
 }
 
 // GetResourcesAtAnyAPIVersion queries the API server for all supported versions of the group and resource related to the passed kind. It then attempts to get the
@@ -248,43 +222,34 @@ func (c *Client) GetResourcesAtAnyAPIVersion(ctx context.Context, params ListPar
 		return nil, err
 	}
 
-	var list *unstructured.UnstructuredList
+	clusterID, err := c.GetClusterID(ctx, params.Token, params.Cluster)
+	if err != nil {
+		return nil, err
+	}
+
+	var objs []*unstructured.Unstructured
 	for _, version := range versions {
 		currentGVK.Version = version
-		resourceInterface, err := c.GetResourceInterface(ctx, params.Token, params.Namespace, params.Cluster, currentGVK)
-		if err != nil {
-			return nil, err
-		}
-		opts := metav1.ListOptions{}
-		if params.LabelSelector != "" {
-			opts.LabelSelector = params.LabelSelector
-		}
-		if params.Limit > 0 {
-			opts.Limit = params.Limit
-		}
-		list, err = resourceInterface.List(ctx, opts)
+		objs, err = c.SteveList(ctx, params.Token, clusterID, currentGVK, params.Namespace, params.LabelSelector, params.Limit)
 		if err != nil {
 			if errors.IsNotFound(err) {
 				continue
 			}
 			return nil, err
 		}
-		break
+		if len(objs) > 0 {
+			break
+		}
 	}
 
-	if list == nil || len(list.Items) == 0 {
+	if len(objs) == 0 {
 		return nil, errors.NewNotFound(schema.GroupResource{
 			Group:    currentGVK.Group,
 			Resource: currentGVK.Resource,
 		}, params.Name)
 	}
 
-	objs := make([]*unstructured.Unstructured, len(list.Items))
-	for i := range list.Items {
-		objs[i] = &list.Items[i]
-	}
-
-	return objs, err
+	return objs, nil
 }
 
 // getClusterId returns the cluster's unique ID given either its cluster ID (metadata.name)
@@ -313,24 +278,22 @@ func (c *Client) GetClusterID(ctx context.Context, token string, clusterNameOrID
 		return clusterID.(string), nil
 	}
 
-	// try to fetch the cluster directly by its ID
-	clusterInterface, err := c.GetResourceInterface(ctx, token, "", "local", converter.K8sKindsToGVRs["managementcluster"])
-	if err != nil {
-		return "", err
-	}
-
-	cluster, err := clusterInterface.Get(ctx, clusterNameOrID, metav1.GetOptions{})
+	// try to fetch the cluster directly by its ID, through Steve so a token
+	// without cluster-wide RBAC still sees the clusters it's scoped to
+	// instead of a hard 403 (this is what backs listClusters/getProject).
+	managementClusterGVR := converter.K8sKindsToGVRs["managementcluster"]
+	cluster, err := c.SteveGet(ctx, token, "local", managementClusterGVR, "", clusterNameOrID)
 	if err != nil {
 		if !errors.IsNotFound(err) {
 			return "", err
 		}
 
 		// If not found by ID, try to locate it by display name.
-		clusters, err := clusterInterface.List(ctx, metav1.ListOptions{})
+		clusters, err := c.SteveList(ctx, token, "local", managementClusterGVR, "", "", 0)
 		if err != nil {
 			return "", err
 		}
-		for _, cluster := range clusters.Items {
+		for _, cluster := range clusters {
 			clusterID := cluster.GetName()
 			clusterIdsCache.Store(clusterID, struct{}{})
 

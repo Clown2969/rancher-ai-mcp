@@ -6,6 +6,7 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"github.com/rancher/rancher-ai-mcp/internal/middleware"
 	"github.com/rancher/rancher-ai-mcp/pkg/client"
+	"github.com/rancher/rancher-ai-mcp/pkg/client/stevetest"
 	"github.com/rancher/rancher-ai-mcp/pkg/client/test"
 	provisioningV1 "github.com/rancher/rancher/pkg/apis/provisioning.cattle.io/v1"
 	"github.com/stretchr/testify/assert"
@@ -1453,6 +1454,7 @@ func TestAnalyzeCluster(t *testing.T) {
 				DynClientCreator: func(inConfig *rest.Config) (dynamic.Interface, error) {
 					return tt.fakeDynClient, nil
 				},
+				SteveTransport: stevetest.NewRoundTripperWithListKinds(tt.fakeDynClient, provisioningCustomListKinds()),
 			}
 			tools := NewTools(test.WrapClient(c, testToken), false)
 			req := &mcp.CallToolRequest{}

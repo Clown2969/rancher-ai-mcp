@@ -6,6 +6,7 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"github.com/rancher/rancher-ai-mcp/internal/middleware"
 	"github.com/rancher/rancher-ai-mcp/pkg/client"
+	"github.com/rancher/rancher-ai-mcp/pkg/client/stevetest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
@@ -61,9 +62,12 @@ func TestMoveNamespace(t *testing.T) {
 		{Group: "management.cattle.io", Version: "v3", Resource: "projects"}: "ProjectList",
 	}, cluster, project, namespaceResource)
 
-	c := &client.Client{DynClientCreator: func(*rest.Config) (dynamic.Interface, error) {
-		return fakeDynClient, nil
-	}}
+	c := &client.Client{
+		DynClientCreator: func(*rest.Config) (dynamic.Interface, error) {
+			return fakeDynClient, nil
+		},
+		SteveTransport: stevetest.NewRoundTripper(fakeDynClient),
+	}
 	tools := NewTools(newFakeToolsClient(c, fakeToken), false)
 
 	result, _, err := tools.moveNamespace(middleware.WithToken(t.Context(), fakeToken), &mcp.CallToolRequest{}, moveNamespaceParams{
