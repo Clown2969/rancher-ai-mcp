@@ -3,7 +3,7 @@ package cmd
 import (
 	"strings"
 
-	"github.com/rancher/rancher-ai-mcp/pkg/version"
+	"github.com/Clown2969/rancher-ai-mcp/pkg/version"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"

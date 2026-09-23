@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
-	"github.com/rancher/rancher-ai-mcp/pkg/client"
-	"github.com/rancher/rancher-ai-mcp/pkg/toolsets/provisioning"
+	"github.com/Clown2969/rancher-ai-mcp/pkg/client"
+	"github.com/Clown2969/rancher-ai-mcp/pkg/toolsets/provisioning"
 	"github.com/stretchr/testify/assert"
 )
 

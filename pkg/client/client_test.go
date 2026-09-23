@@ -6,7 +6,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/rancher/rancher-ai-mcp/pkg/client/stevetest"
+	"github.com/Clown2969/rancher-ai-mcp/pkg/client/stevetest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	v1 "k8s.io/api/core/v1"

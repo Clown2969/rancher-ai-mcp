@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/rancher/rancher-ai-mcp/pkg/client"
-	"github.com/rancher/rancher-ai-mcp/pkg/client/stevetest"
+	"github.com/Clown2969/rancher-ai-mcp/pkg/client"
+	"github.com/Clown2969/rancher-ai-mcp/pkg/client/stevetest"
 	"k8s.io/utils/ptr"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"

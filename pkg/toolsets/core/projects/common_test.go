@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/rancher/rancher-ai-mcp/pkg/client"
+	"github.com/Clown2969/rancher-ai-mcp/pkg/client"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"

@@ -12,7 +12,7 @@ import (
 	"strings"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
-	"github.com/rancher/rancher-ai-mcp/pkg/toolsets"
+	"github.com/Clown2969/rancher-ai-mcp/pkg/toolsets"
 )
 
 const outputFile = "TOOLS.md"

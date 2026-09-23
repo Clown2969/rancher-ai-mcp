@@ -5,10 +5,10 @@ import (
 	"strings"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
-	"github.com/rancher/rancher-ai-mcp/internal/middleware"
-	"github.com/rancher/rancher-ai-mcp/pkg/client"
-	"github.com/rancher/rancher-ai-mcp/pkg/response"
-	"github.com/rancher/rancher-ai-mcp/pkg/toolsets/core/projects"
+	"github.com/Clown2969/rancher-ai-mcp/internal/middleware"
+	"github.com/Clown2969/rancher-ai-mcp/pkg/client"
+	"github.com/Clown2969/rancher-ai-mcp/pkg/response"
+	"github.com/Clown2969/rancher-ai-mcp/pkg/toolsets/core/projects"
 	"go.uber.org/zap"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )

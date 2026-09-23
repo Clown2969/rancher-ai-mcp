@@ -6,7 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/rancher/rancher-ai-mcp/pkg/client"
+	"github.com/Clown2969/rancher-ai-mcp/pkg/client"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"github.com/stretchr/testify/assert"

@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
-	"github.com/rancher/rancher-ai-mcp/pkg/converter"
-	"github.com/rancher/rancher-ai-mcp/pkg/response"
-	"github.com/rancher/rancher-ai-mcp/pkg/utils"
+	"github.com/Clown2969/rancher-ai-mcp/pkg/converter"
+	"github.com/Clown2969/rancher-ai-mcp/pkg/response"
+	"github.com/Clown2969/rancher-ai-mcp/pkg/utils"
 	"go.uber.org/zap"
 )
 

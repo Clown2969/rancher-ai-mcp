@@ -3,7 +3,7 @@ package main
 //go:generate go run ./internal/toolsdoc
 
 import (
-	"github.com/rancher/rancher-ai-mcp/cmd"
+	"github.com/Clown2969/rancher-ai-mcp/cmd"
 )
 
 func main() {

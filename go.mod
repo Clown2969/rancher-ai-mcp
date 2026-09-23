@@ -1,4 +1,4 @@
-module github.com/rancher/rancher-ai-mcp
+module github.com/Clown2969/rancher-ai-mcp
 
 go 1.26.0
 

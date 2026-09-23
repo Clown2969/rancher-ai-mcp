@@ -11,9 +11,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/rancher/rancher-ai-mcp/internal/middleware"
-	"github.com/rancher/rancher-ai-mcp/pkg/client"
-	"github.com/rancher/rancher-ai-mcp/pkg/converter"
+	"github.com/Clown2969/rancher-ai-mcp/internal/middleware"
+	"github.com/Clown2969/rancher-ai-mcp/pkg/client"
+	"github.com/Clown2969/rancher-ai-mcp/pkg/converter"
 	provisioningV1 "github.com/rancher/rancher/pkg/apis/provisioning.cattle.io/v1"
 	"go.uber.org/zap"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"

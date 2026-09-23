@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/rancher/rancher-ai-mcp/internal/middleware"
-	"github.com/rancher/rancher-ai-mcp/pkg/converter"
-	"github.com/rancher/rancher-ai-mcp/pkg/response"
-	"github.com/rancher/rancher-ai-mcp/pkg/utils"
+	"github.com/Clown2969/rancher-ai-mcp/internal/middleware"
+	"github.com/Clown2969/rancher-ai-mcp/pkg/converter"
+	"github.com/Clown2969/rancher-ai-mcp/pkg/response"
+	"github.com/Clown2969/rancher-ai-mcp/pkg/utils"
 	"k8s.io/utils/ptr"
 
 	"go.uber.org/zap"

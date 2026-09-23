@@ -8,9 +8,9 @@ import (
 
 	jsonpatch "github.com/evanphx/json-patch/v5"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
-	"github.com/rancher/rancher-ai-mcp/internal/middleware"
-	"github.com/rancher/rancher-ai-mcp/pkg/converter"
-	"github.com/rancher/rancher-ai-mcp/pkg/response"
+	"github.com/Clown2969/rancher-ai-mcp/internal/middleware"
+	"github.com/Clown2969/rancher-ai-mcp/pkg/converter"
+	"github.com/Clown2969/rancher-ai-mcp/pkg/response"
 	"go.uber.org/zap"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )

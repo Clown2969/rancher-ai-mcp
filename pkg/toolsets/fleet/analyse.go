@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
-	"github.com/rancher/rancher-ai-mcp/internal/middleware"
+	"github.com/Clown2969/rancher-ai-mcp/internal/middleware"
 	"go.uber.org/zap"
 )
 
